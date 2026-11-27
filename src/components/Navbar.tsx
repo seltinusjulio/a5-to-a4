@@ -20,7 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-8">
         {/* Zone 1: Single text element wordmark */}
         <a
-          href="/"
+          href={import.meta.env.BASE_URL}
           className="font-display text-lg font-extrabold tracking-tight text-neutral-950 dark:text-white hover:text-[#D9381E] dark:hover:text-[#F04A2E] transition-colors whitespace-nowrap shrink-0"
         >
           BukuCepat
