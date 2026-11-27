@@ -1,0 +1,56 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.6.9/schema.json",
+  "files": {
+    "includes": ["src/**/*.ts", "src/**/*.tsx"]
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "a11y": "off",
+      "style": "off",
+      "complexity": "off",
+      "correctness": {
+        "noConstAssign": "error",
+        "noGlobalObjectCalls": "error",
+        "noInvalidBuiltinInstantiation": "error",
+        "noInvalidConstructorSuper": "error",
+        "noPrecisionLoss": "error",
+        "noSelfAssign": "error",
+        "noSetterReturn": "error",
+        "noSwitchDeclarations": "error",
+        "noUnreachable": "error",
+        "noUnreachableSuper": "error",
+        "noUnsafeFinally": "error",
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error",
+        "useExhaustiveDependencies": "warn",
+        "useHookAtTopLevel": "error",
+        "useIsNan": "error",
+        "useValidForDirection": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off",
+        "noAsyncPromiseExecutor": "error",
+        "noCatchAssign": "error",
+        "noClassAssign": "error",
+        "noCompareNegZero": "error",
+        "noDoubleEquals": "warn",
+        "noDuplicateCase": "error",
+        "noDuplicateClassMembers": "error",
+        "noDuplicateJsxProps": "error",
+        "noDuplicateObjectKeys": "error",
+        "noDuplicateParameters": "error",
+        "noExtraNonNullAssertion": "error",
+        "noFallthroughSwitchClause": "error",
+        "noFunctionAssign": "error",
+        "noGlobalAssign": "error",
+        "noImportAssign": "error",
+        "noRedeclare": "error",
+        "noSelfCompare": "error",
+        "noShadowRestrictedNames": "error",
+        "noUnsafeNegation": "error"
+      }
+    }
+  }
+}

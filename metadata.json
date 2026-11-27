@@ -1,0 +1,6 @@
+{
+  "name": "BukuCepat - Konverter Booklet PDF A5 ke A4",
+  "description": "Konversi dokumen PDF A5 potret menjadi tata letak buku cetak A4 lanskap (bookfold imposition 2-up) langsung di peramban secara privat dan offline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
