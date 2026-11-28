@@ -51,13 +51,13 @@ describe('ThemeContext', () => {
     fireEvent.click(screen.getByText('Toggle Theme'));
     expect(screen.getByTestId('current-theme').textContent).toBe('dark');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
-    expect(localStorage.getItem('bukucepat-theme')).toBe('dark');
+    expect(localStorage.getItem('katern-theme')).toBe('dark');
 
     // Toggle back to light
     fireEvent.click(screen.getByText('Toggle Theme'));
     expect(screen.getByTestId('current-theme').textContent).toBe('light');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
-    expect(localStorage.getItem('bukucepat-theme')).toBe('light');
+    expect(localStorage.getItem('katern-theme')).toBe('light');
   });
 
   it('supports explicit setTheme', () => {
@@ -75,7 +75,7 @@ describe('ThemeContext', () => {
   });
 
   it('reads pre-existing theme from localStorage if available', () => {
-    localStorage.setItem('bukucepat-theme', 'dark');
+    localStorage.setItem('katern-theme', 'dark');
 
     render(
       <ThemeProvider>
@@ -134,7 +134,7 @@ describe('ThemeContext', () => {
     expect(screen.getByTestId('current-theme').textContent).toBe('light');
 
     // Remove saved item to simulate user not having a hardcoded choice
-    localStorage.removeItem('bukucepat-theme');
+    localStorage.removeItem('katern-theme');
     act(() => {
       if (listener) {
         (listener as any)({ matches: true } as MediaQueryListEvent);

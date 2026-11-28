@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Izin minimal BukuCepat Portabel: dialog simpan berkas dan penulisan ke lokasi pilihan pengguna",
+  "description": "Izin minimal Katern Portabel: dialog simpan berkas dan penulisan ke lokasi pilihan pengguna",
   "windows": ["main"],
   "permissions": [
     "core:default",

@@ -18,7 +18,7 @@ import './index.css';
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary
     title="Aplikasi mengalami gangguan tak terduga"
-    description="Muat ulang panel untuk memulihkan tampilan BukuCepat."
+    description="Muat ulang panel untuk memulihkan tampilan Katern."
   >
     <ThemeProvider>
       <ToastProvider>

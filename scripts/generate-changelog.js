@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Automatic Git-to-CHANGELOG.md generator for BukuCepat.
+ * Automatic Git-to-CHANGELOG.md generator for Katern.
  *
  * Reads recent commits from git history (since the latest tag, or recent commits),
  * categorizes them cleanly under `## [Unreleased]` in CHANGELOG.md, deduplicates by
@@ -29,7 +29,7 @@ const SKIP_PATTERNS = [
 
 const DEFAULT_HEADER = `# Changelog
 
-Semua perubahan penting pada **BukuCepat** dicatat dalam berkas ini.
+Semua perubahan penting pada **Katern** dicatat dalam berkas ini.
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan penomoran versi mengikuti [Semantic Versioning](https://semver.org/).
 

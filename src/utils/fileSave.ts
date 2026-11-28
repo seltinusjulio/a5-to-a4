@@ -1,5 +1,5 @@
 /**
- * Dual-target binary file saving utility for BukuCepat.
+ * Dual-target binary file saving utility for Katern.
  * - On Tauri desktop (Windows portable): opens the native OS "Save As" dialog
  *   and writes directly to the user-selected file path.
  * - On Web / GitHub Pages: triggers a standard browser Blob download.

@@ -1,4 +1,4 @@
-name: Deploy BukuCepat ke GitHub Pages
+name: Deploy Katern ke GitHub Pages
 
 on:
   push:

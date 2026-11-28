@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "BukuCepat",
+  "productName": "Katern",
   "version": "1.0.0",
-  "identifier": "id.bukucepat.app",
+  "identifier": "id.katern.app",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:3000",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "BukuCepat — Konverter Booklet PDF A5 ke A4",
+        "title": "Katern — Konverter Booklet PDF A5 ke A4",
         "width": 1360,
         "height": 860,
         "minWidth": 960,

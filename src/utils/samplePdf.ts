@@ -107,7 +107,7 @@ export async function createSampleA5Pdf(): Promise<ArrayBuffer> {
   });
 
   // Cover body note
-  p1.drawText('Dibuat dengan Aplikasi BukuCepat', {
+  p1.drawText('Dibuat dengan Aplikasi Katern', {
     x: 36,
     y: 280,
     size: 12,
@@ -164,7 +164,7 @@ export async function createSampleA5Pdf(): Promise<ArrayBuffer> {
   });
 
   const p2Lines = [
-    'Selamat datang di dokumen uji coba konversi booklet BukuCepat.',
+    'Selamat datang di dokumen uji coba konversi booklet Katern.',
     '',
     'Ketika mencetak buku saku atau modul belajar, kita sering mengalami',
     'kesulitan saat menyusun halaman secara manual. Memasangkan halaman',
@@ -367,7 +367,7 @@ export async function createSampleA5Pdf(): Promise<ArrayBuffer> {
     '   Anda dapat mencetak Lembar 1 pada kertas Concorde atau Art Paper 150 GSM',
     '   untuk memberikan cover bertekstur elegan pada booklet Anda.',
     '',
-    'Aplikasi BukuCepat berjalan sepenuhnya di peramban Anda secara instan dan aman.',
+    'Aplikasi Katern berjalan sepenuhnya di peramban Anda secara instan dan aman.',
   ];
   curY = A5_H - 100;
   for (const line of p7Lines) {
@@ -413,7 +413,7 @@ export async function createSampleA5Pdf(): Promise<ArrayBuffer> {
   });
 
   const p8Desc = [
-    'BukuCepat mengubah dokumen naskah digital menjadi buku fisik dengan',
+    'Katern mengubah dokumen naskah digital menjadi buku fisik dengan',
     'tata letak presisi tinggi tanpa perlu perangkat lunak mahal atau pengaturan printer rumit.',
     '',
     'Fitur Unggulan:',
@@ -468,7 +468,7 @@ export async function createSampleA5Pdf(): Promise<ArrayBuffer> {
     font: fontRegular,
     color: textMuted,
   });
-  p8.drawText('BukuCepat Mandiri', {
+  p8.drawText('Katern Mandiri', {
     x: 200,
     y: 142,
     size: 10,
@@ -490,7 +490,7 @@ export async function createSampleA5Pdf(): Promise<ArrayBuffer> {
     font: fontBold,
     color: rgb(1, 1, 1),
   });
-  p8.drawText('Terima kasih telah menggunakan konverter BukuCepat.', {
+  p8.drawText('Terima kasih telah menggunakan konverter Katern.', {
     x: 36,
     y: 24,
     size: 8.5,

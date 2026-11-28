@@ -1,4 +1,4 @@
-name: Rilis Portabel Windows (BukuCepat)
+name: Rilis Portabel Windows (Katern)
 
 on:
   push:
@@ -78,7 +78,7 @@ jobs:
           node scripts/release.mjs sync-version $cleanVersion
           echo "version=$cleanVersion" >> $env:GITHUB_OUTPUT
           echo "tag=$tagName" >> $env:GITHUB_OUTPUT
-          Write-Host "Membangun BukuCepat Portabel versi $tagName"
+          Write-Host "Membangun Katern Portabel versi $tagName"
 
       - name: Jalankan lint & typecheck
         run: npm run lint
@@ -97,30 +97,30 @@ jobs:
         run: |
           $version = "${{ steps.version.outputs.version }}"
           $tag = "${{ steps.version.outputs.tag }}"
-          $exeSource = "src-tauri\target\release\bukucepat.exe"
+          $exeSource = "src-tauri\target\release\katern.exe"
 
           if (-not (Test-Path $exeSource)) {
             throw "Biner portabel tidak ditemukan di $exeSource"
           }
 
-          $stageDir = "portable-stage\BukuCepat-$tag-windows-x64"
+          $stageDir = "portable-stage\Katern-$tag-windows-x64"
           $outDir = "release-assets"
           New-Item -ItemType Directory -Force -Path $stageDir, $outDir | Out-Null
 
-          Copy-Item $exeSource "$stageDir\BukuCepat.exe"
+          Copy-Item $exeSource "$stageDir\Katern.exe"
           Copy-Item "CHANGELOG.md" "$stageDir\CHANGELOG.md"
 
           $readme = @"
           ==============================================================
-          BUKUCEPAT $tag — APLIKASI PORTABEL WINDOWS (100% OFFLINE)
+          KATERN $tag — APLIKASI PORTABEL WINDOWS (100% OFFLINE)
           ==============================================================
 
-          BukuCepat adalah konverter PDF A5 Potret ke Booklet A4 Lanskap
+          Katern adalah konverter PDF A5 Potret ke Booklet A4 Lanskap
           (2-Up saddle-stitch) yang berjalan 100% lokal di komputer Anda
           tanpa koneksi internet dan tanpa instalasi.
 
           CARA MENJALANKAN:
-          1. Klik ganda berkas "BukuCepat.exe" dari folder mana saja
+          1. Klik ganda berkas "Katern.exe" dari folder mana saja
              (Desktop, Dokumen, atau langsung dari Flashdisk).
           2. Jika muncul jendela "Windows protected your PC" (SmartScreen)
              pada pemakaian pertama, klik "More info" lalu "Run anyway".
@@ -136,8 +136,8 @@ jobs:
           "@
           Set-Content -Path "$stageDir\README-PORTABEL.txt" -Value $readme -Encoding UTF8
 
-          $zipPath = "$outDir\BukuCepat-$tag-windows-x64-portable.zip"
-          $standaloneExe = "$outDir\BukuCepat-$tag-windows-x64.exe"
+          $zipPath = "$outDir\Katern-$tag-windows-x64-portable.zip"
+          $standaloneExe = "$outDir\Katern-$tag-windows-x64.exe"
 
           Compress-Archive -Path "$stageDir\*" -DestinationPath $zipPath -Force
           Copy-Item $exeSource $standaloneExe -Force
@@ -157,7 +157,7 @@ jobs:
       - name: Unggah artefak build Actions
         uses: actions/upload-artifact@v4
         with:
-          name: BukuCepat-${{ steps.version.outputs.tag }}-windows-x64-portable
+          name: Katern-${{ steps.version.outputs.tag }}-windows-x64-portable
           path: |
             release-assets/*
             release-notes.md
@@ -168,11 +168,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: BukuCepat ${{ steps.version.outputs.tag }} (Windows Portabel)
+          name: Katern ${{ steps.version.outputs.tag }} (Windows Portabel)
           body_path: release-notes.md
           draft: false
           prerelease: ${{ contains(steps.version.outputs.version, '-') }}
           files: |
-            release-assets/BukuCepat-${{ steps.version.outputs.tag }}-windows-x64-portable.zip
-            release-assets/BukuCepat-${{ steps.version.outputs.tag }}-windows-x64.exe
+            release-assets/Katern-${{ steps.version.outputs.tag }}-windows-x64-portable.zip
+            release-assets/Katern-${{ steps.version.outputs.tag }}-windows-x64.exe
             release-assets/SHA256SUMS.txt

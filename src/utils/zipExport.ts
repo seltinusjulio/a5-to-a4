@@ -69,10 +69,10 @@ export async function exportBatchAsZip(
 
   // Include comprehensive Indonesian print instructions text file inside zip
   const readmeText = `=====================================================
-PANDUAN MENCETAK BOOKLET PDF A4 LANSKAP (BUKUCEPAT)
+PANDUAN MENCETAK BOOKLET PDF A4 LANSKAP (KATERN)
 =====================================================
 
-Terima kasih telah menggunakan BukuCepat (Konverter Booklet PDF).
+Terima kasih telah menggunakan Katern (Konverter Booklet PDF).
 Seluruh berkas PDF dalam arsip ZIP ini telah diimposisi menjadi
 tata letak 2-Up A4 Lanskap yang siap dicetak bolak-balik.
 

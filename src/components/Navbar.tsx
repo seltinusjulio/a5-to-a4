@@ -23,7 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           href={import.meta.env.BASE_URL}
           className="font-display text-lg font-extrabold tracking-tight text-neutral-950 dark:text-white hover:text-[#D9381E] dark:hover:text-[#F04A2E] transition-colors whitespace-nowrap shrink-0"
         >
-          BukuCepat
+          Katern
         </a>
 
         {/* Zone 2: Clean single-line text navigation links */}

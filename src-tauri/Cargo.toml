@@ -1,12 +1,12 @@
 [package]
-name = "bukucepat"
+name = "katern"
 version = "1.0.0"
-description = "BukuCepat - Konverter Booklet PDF A5 ke A4 offline portabel untuk Windows"
-authors = ["BukuCepat"]
+description = "Katern - Konverter Booklet PDF A5 ke A4 offline portabel untuk Windows"
+authors = ["Katern"]
 edition = "2021"
 
 [lib]
-name = "bukucepat_lib"
+name = "katern_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

@@ -4,5 +4,5 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .run(tauri::generate_context!())
-        .expect("gagal menjalankan aplikasi portabel BukuCepat");
+        .expect("gagal menjalankan aplikasi portabel Katern");
 }

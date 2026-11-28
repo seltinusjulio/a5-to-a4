@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Release & Changelog management CLI for BukuCepat.
+ * Release & Changelog management CLI for Katern.
  *
  * Usage:
  *   node scripts/release.mjs bump <version>              Sync version across package.json, tauri.conf.json, Cargo.toml & roll CHANGELOG.md [Unreleased]
@@ -154,17 +154,17 @@ function main() {
 
     const extracted =
       extractChangelogSection(content, version) ||
-      `### Rilis BukuCepat v${version}\n- Paket portabel Windows offline (tanpa installer).`;
+      `### Rilis Katern v${version}\n- Paket portabel Windows offline (tanpa installer).`;
 
     const formatted = [
-      `## BukuCepat v${version} — Windows Portabel (Offline)`,
+      `## Katern v${version} — Windows Portabel (Offline)`,
       '',
       extracted,
       '',
       '---',
       '### Cara Menjalankan (Portabel, Tanpa Instalasi)',
-      '1. Unduh berkas `BukuCepat-v' + version + '-windows-x64-portable.zip` (atau langsung berkas `.exe`).',
-      '2. Ekstrak ke folder mana saja (termasuk flashdisk) lalu klik ganda **`BukuCepat.exe`**.',
+      '1. Unduh berkas `Katern-v' + version + '-windows-x64-portable.zip` (atau langsung berkas `.exe`).',
+      '2. Ekstrak ke folder mana saja (termasuk flashdisk) lalu klik ganda **`Katern.exe`**.',
       '3. Jika muncul peringatan Windows SmartScreen pada pemakaian pertama, pilih **More info → Run anyway**.',
       '',
     ].join('\n');

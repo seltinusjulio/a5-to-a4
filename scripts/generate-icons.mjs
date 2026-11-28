@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generates crisp boxy Swiss prepress RGBA PNG & multi-size Windows ICO icons
- * for BukuCepat (src-tauri/icons/) without external native dependencies.
+ * for Katern (src-tauri/icons/) without external native dependencies.
  */
 
 import fs from 'node:fs';
@@ -60,7 +60,7 @@ function encodeRgbaPng(width, height, rgba) {
   ]);
 }
 
-function drawBukuCepatIcon(size) {
+function drawKaternIcon(size) {
   const rgba = Buffer.alloc(size * size * 4);
   const setPx = (x, y, r, g, b, a = 255) => {
     if (x < 0 || y < 0 || x >= size || y >= size) return;
@@ -154,11 +154,11 @@ function encodeIco(pngEntries) {
 
 fs.mkdirSync(ICON_DIR, { recursive: true });
 
-const png16 = drawBukuCepatIcon(16);
-const png32 = drawBukuCepatIcon(32);
-const png48 = drawBukuCepatIcon(48);
-const png128 = drawBukuCepatIcon(128);
-const png256 = drawBukuCepatIcon(256);
+const png16 = drawKaternIcon(16);
+const png32 = drawKaternIcon(32);
+const png48 = drawKaternIcon(48);
+const png128 = drawKaternIcon(128);
+const png256 = drawKaternIcon(256);
 
 fs.writeFileSync(path.join(ICON_DIR, '32x32.png'), png32);
 fs.writeFileSync(path.join(ICON_DIR, '128x128.png'), png128);
@@ -174,4 +174,4 @@ fs.writeFileSync(
   ])
 );
 
-console.log('Ikon BukuCepat berhasil dibuat di src-tauri/icons/.');
+console.log('Ikon Katern berhasil dibuat di src-tauri/icons/.');

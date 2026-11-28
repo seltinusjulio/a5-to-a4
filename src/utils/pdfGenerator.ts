@@ -368,7 +368,7 @@ export async function generateBookletPdf(
 
   // Set standard PDF metadata
   outDoc.setTitle(`Booklet - ${imposition.metadata.filename}`);
-  outDoc.setProducer('BukuCepat PDF Booklet Converter (Client-side)');
+  outDoc.setProducer('Katern PDF Booklet Converter (Client-side)');
 
   if (exportOptions.onProgress) {
     exportOptions.onProgress('Mengompresi struktur berkas PDF...', 95);

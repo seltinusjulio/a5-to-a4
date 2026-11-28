@@ -1,4 +1,4 @@
-name: Build Portabel Windows (Artifact)
+name: Build Portabel Windows — Katern (Artifact)
 
 on:
   push:
@@ -65,7 +65,7 @@ jobs:
       - name: Siapkan folder portabel siap unduh
         shell: pwsh
         run: |
-          $exeSource = "src-tauri\target\release\bukucepat.exe"
+          $exeSource = "src-tauri\target\release\katern.exe"
           if (-not (Test-Path $exeSource)) {
             throw "Biner portabel tidak ditemukan di $exeSource"
           }
@@ -80,20 +80,20 @@ jobs:
           }
           New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
-          Copy-Item $exeSource "$outDir\BukuCepat.exe" -Force
+          Copy-Item $exeSource "$outDir\Katern.exe" -Force
           if (Test-Path "CHANGELOG.md") {
             Copy-Item "CHANGELOG.md" "$outDir\CHANGELOG.md" -Force
           }
 
           $readme = @"
           ==============================================================
-          BUKUCEPAT v$version ($shortSha) — PORTABEL WINDOWS (OFFLINE)
+          KATERN v$version ($shortSha) — PORTABEL WINDOWS (OFFLINE)
           ==============================================================
 
           Aplikasi portabel tanpa installer. Cukup ekstrak arsip ZIP ini
           ke folder mana saja (atau flashdisk) lalu klik ganda:
 
-            BukuCepat.exe
+            Katern.exe
 
           Catatan:
           - Jika muncul peringatan Windows SmartScreen saat pertama kali
@@ -103,13 +103,13 @@ jobs:
           "@
           Set-Content -Path "$outDir\README-PORTABEL.txt" -Value $readme -Encoding UTF8
 
-          $hash = (Get-FileHash -Path "$outDir\BukuCepat.exe" -Algorithm SHA256).Hash.ToLower()
-          Set-Content -Path "$outDir\SHA256SUMS.txt" -Value "$hash  BukuCepat.exe" -Encoding ASCII
+          $hash = (Get-FileHash -Path "$outDir\Katern.exe" -Algorithm SHA256).Hash.ToLower()
+          Set-Content -Path "$outDir\SHA256SUMS.txt" -Value "$hash  Katern.exe" -Encoding ASCII
 
       - name: Unggah folder ZIP portabel sebagai Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BukuCepat-Windows-Portable
+          name: Katern-Windows-Portable
           path: portable-dist/
           if-no-files-found: error
           compression-level: 9

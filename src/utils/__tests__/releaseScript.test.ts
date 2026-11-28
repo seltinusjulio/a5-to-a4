@@ -15,7 +15,7 @@ const sampleChangelog = `# Changelog
 ## [1.0.0] - 2026-11-28
 
 ### Ditambahkan
-- Rilis perdana BukuCepat.
+- Rilis perdana Katern.
 `;
 
 describe('release & changelog automation script', () => {
@@ -35,7 +35,7 @@ describe('release & changelog automation script', () => {
   it('extracts release notes accurately for a requested version tag', () => {
     const notes = extractChangelogSection(sampleChangelog, 'v1.0.0');
     expect(notes).toContain('### Ditambahkan');
-    expect(notes).toContain('Rilis perdana BukuCepat.');
+    expect(notes).toContain('Rilis perdana Katern.');
     expect(notes).not.toContain('Fitur portabel');
     expect(extractChangelogSection(sampleChangelog, '9.9.9')).toBeNull();
   });

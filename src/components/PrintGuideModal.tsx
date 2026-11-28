@@ -48,7 +48,7 @@ export const PrintGuideModal: React.FC<PrintGuideModalProps> = ({
                 Buka Berkas PDF Hasil Konversi
               </h4>
               <p className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
-                Unduh berkas booklet dari BukuCepat, lalu buka di pembaca PDF (Chrome, Edge, Adobe Reader, atau Preview). Tekan{' '}
+                Unduh berkas booklet dari Katern, lalu buka di pembaca PDF (Chrome, Edge, Adobe Reader, atau Preview). Tekan{' '}
                 <kbd className="px-1.5 py-0.5 bg-[#FAFAF8] dark:bg-[#1E1E1E] border border-neutral-400 dark:border-neutral-600 text-[11px] font-mono">
                   Ctrl + P
                 </kbd>{' '}

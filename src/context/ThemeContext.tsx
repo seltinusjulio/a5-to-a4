@@ -14,7 +14,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [theme, setThemeState] = useState<Theme>(() => {
     // Check localStorage
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('bukucepat-theme') as Theme | null;
+      const saved = (localStorage.getItem('katern-theme') ||
+        localStorage.getItem('bukucepat-theme')) as Theme | null;
       if (saved === 'light' || saved === 'dark') {
         return saved;
       }
@@ -33,7 +34,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('bukucepat-theme', theme);
+    localStorage.setItem('katern-theme', theme);
   }, [theme]);
 
   // Listen to system changes if user hasn't explicitly set preference
@@ -41,7 +42,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (typeof window === 'undefined' || !window.matchMedia) return;
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
-      const saved = localStorage.getItem('bukucepat-theme');
+      const saved = localStorage.getItem('katern-theme') || localStorage.getItem('bukucepat-theme');
       if (!saved) {
         setThemeState(e.matches ? 'dark' : 'light');
       }

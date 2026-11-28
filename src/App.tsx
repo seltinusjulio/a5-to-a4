@@ -499,7 +499,7 @@ export default function App() {
       <footer className="mt-16 bg-white dark:bg-[#121212] border-t border-neutral-900 dark:border-neutral-800 py-6 text-xs text-neutral-600 dark:text-neutral-400 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="font-display font-bold text-neutral-950 dark:text-white">BukuCepat</span>
+            <span className="font-display font-bold text-neutral-950 dark:text-white">Katern</span>
             <span aria-hidden="true">·</span>
             <span>Konverter Booklet PDF A5 ke A4 Lanskap</span>
           </div>
