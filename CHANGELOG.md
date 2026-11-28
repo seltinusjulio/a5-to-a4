@@ -7,10 +7,20 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan pe
 ## [Unreleased]
 
 ### Ditambahkan
+- Add Tauri support for native file management (`fef4bb0` — 2026-11-28)
+- Add GitHub Pages deployment workflow (`a0018dd` — 2026-11-27)
+- Initialize BukuCepat PDF conversion app (`8369c5e` — 2026-11-27)
 - Rilis portabel Windows (`.exe` & `.zip` tanpa installer) berbasis Tauri v2 yang dibangun otomatis lewat GitHub Actions.
 - Mode offline murni: font UI (*Archivo*, *Plus Jakarta Sans*, *JetBrains Mono*) serta CMap & standard fonts PDF.js kini dibundel langsung di dalam aplikasi tanpa panggilan CDN eksternal.
 - Dialog simpan berkas bawaan Windows (*Save As*) otomatis saat mengekspor PDF atau arsip ZIP pada aplikasi desktop portabel.
 - Skrip rilis dan ekstraksi catatan rilis otomatis (`npm run release -- <versi>`).
+
+### Diubah
+- Initial commit (`1f508a6` — 2026-11-27)
+
+### Pemeliharaan
+- **ci:** Implement automated CHANGELOG generation (`2b43a62` — 2026-11-28)
+- Improve base path normalization and cleanup (`a264daf` — 2026-11-28)
 
 ## [1.0.0] - 2026-11-28
 
