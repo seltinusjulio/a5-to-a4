@@ -6,9 +6,6 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan pe
 
 ## [Unreleased]
 
-### Diubah
-- Perubahan nama aplikasi dari *BukuCepat* menjadi **Katern**.
-
 ### Ditambahkan
 - Add Tauri support for native file management (`fef4bb0` — 2026-11-28)
 - Add GitHub Pages deployment workflow (`a0018dd` — 2026-11-27)
@@ -19,6 +16,8 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan pe
 - Skrip rilis dan ekstraksi catatan rilis otomatis (`npm run release -- <versi>`).
 
 ### Diubah
+- Rename application from BukuCepat to Katern (`dbb016e` — 2026-11-28)
+- Perubahan nama aplikasi dari *BukuCepat* menjadi **Katern**.
 - Initial commit (`1f508a6` — 2026-11-27)
 
 ### Pemeliharaan
