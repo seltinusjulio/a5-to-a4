@@ -14,6 +14,11 @@ export interface LoadedPdfDoc {
 // Memory cache for rendered thumbnail data URLs: key is `docId_pageNumber_scale_cropped`
 const thumbnailCache = new Map<string, string>();
 
+const getPdfjsAssetBase = (): string => {
+  const base = (import.meta.env.BASE_URL || '/').trim();
+  return base.endsWith('/') ? base : `${base}/`;
+};
+
 /**
  * Loads a PDF file and extracts core metadata.
  */
@@ -21,11 +26,13 @@ export async function loadPdfDocument(file: File): Promise<LoadedPdfDoc> {
   const arrayBuffer = await file.arrayBuffer();
   // Using a copy of arrayBuffer because pdfjs may transfer it
   const bufferCopy = arrayBuffer.slice(0);
+  const assetBase = getPdfjsAssetBase();
 
   const loadingTask = pdfjsLib.getDocument({
     data: new Uint8Array(arrayBuffer),
-    cMapUrl: 'https://unpkg.com/pdfjs-dist@4.10.38/cmaps/',
+    cMapUrl: `${assetBase}pdfjs/cmaps/`,
     cMapPacked: true,
+    standardFontDataUrl: `${assetBase}pdfjs/standard_fonts/`,
   });
 
   const pdfDocument = await loadingTask.promise;
@@ -89,9 +96,13 @@ export async function loadPdfFromArrayBuffer(
   filename: string
 ): Promise<LoadedPdfDoc> {
   const bufferCopy = arrayBuffer.slice(0);
+  const assetBase = getPdfjsAssetBase();
 
   const loadingTask = pdfjsLib.getDocument({
     data: new Uint8Array(arrayBuffer),
+    cMapUrl: `${assetBase}pdfjs/cmaps/`,
+    cMapPacked: true,
+    standardFontDataUrl: `${assetBase}pdfjs/standard_fonts/`,
   });
 
   const pdfDocument = await loadingTask.promise;

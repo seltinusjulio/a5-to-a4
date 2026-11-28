@@ -1,0 +1,175 @@
+name: Rilis Portabel Windows (BukuCepat)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versi rilis opsional (contoh: 1.0.0; kosongkan untuk memakai versi package.json)'
+        required: false
+        default: ''
+      publish_release:
+        description: 'Publikasikan juga ke GitHub Releases (hanya jika dijalankan manual)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-windows-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-windows-portable:
+    name: Build Windows Portabel (x64)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repositori
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo & Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Instal dependensi frontend
+        shell: pwsh
+        run: |
+          if (Test-Path package-lock.json) {
+            npm ci
+          } else {
+            npm install --no-audit --no-fund
+          }
+
+      - name: Tentukan & sinkronkan versi rilis
+        id: version
+        shell: pwsh
+        run: |
+          $rawTag = ""
+          if ("${{ github.ref_type }}" -eq "tag") {
+            $rawTag = "${{ github.ref_name }}"
+          } elseif ("${{ inputs.version }}" -ne "") {
+            $rawTag = "${{ inputs.version }}"
+          } else {
+            $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+            $rawTag = $pkg.version
+          }
+
+          $cleanVersion = $rawTag.TrimStart('v')
+          $tagName = "v$cleanVersion"
+
+          node scripts/release.mjs sync-version $cleanVersion
+          echo "version=$cleanVersion" >> $env:GITHUB_OUTPUT
+          echo "tag=$tagName" >> $env:GITHUB_OUTPUT
+          Write-Host "Membangun BukuCepat Portabel versi $tagName"
+
+      - name: Jalankan lint & typecheck
+        run: npm run lint
+
+      - name: Jalankan pengujian otomatis
+        run: npm test
+
+      - name: Build biner portabel Windows (Tauri v2 --no-bundle)
+        shell: pwsh
+        env:
+          VITE_BASE_PATH: /
+        run: npx tauri build --no-bundle
+
+      - name: Kemas paket portabel (.zip, .exe, & SHA256SUMS)
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $tag = "${{ steps.version.outputs.tag }}"
+          $exeSource = "src-tauri\target\release\bukucepat.exe"
+
+          if (-not (Test-Path $exeSource)) {
+            throw "Biner portabel tidak ditemukan di $exeSource"
+          }
+
+          $stageDir = "portable-stage\BukuCepat-$tag-windows-x64"
+          $outDir = "release-assets"
+          New-Item -ItemType Directory -Force -Path $stageDir, $outDir | Out-Null
+
+          Copy-Item $exeSource "$stageDir\BukuCepat.exe"
+          Copy-Item "CHANGELOG.md" "$stageDir\CHANGELOG.md"
+
+          $readme = @"
+          ==============================================================
+          BUKUCEPAT $tag — APLIKASI PORTABEL WINDOWS (100% OFFLINE)
+          ==============================================================
+
+          BukuCepat adalah konverter PDF A5 Potret ke Booklet A4 Lanskap
+          (2-Up saddle-stitch) yang berjalan 100% lokal di komputer Anda
+          tanpa koneksi internet dan tanpa instalasi.
+
+          CARA MENJALANKAN:
+          1. Klik ganda berkas "BukuCepat.exe" dari folder mana saja
+             (Desktop, Dokumen, atau langsung dari Flashdisk).
+          2. Jika muncul jendela "Windows protected your PC" (SmartScreen)
+             pada pemakaian pertama, klik "More info" lalu "Run anyway".
+
+          PERSYARATAN SISTEM:
+          - Windows 10 (versi terbaru) atau Windows 11 64-bit.
+          - Menggunakan Microsoft Edge WebView2 bawaan Windows.
+
+          TIPS CETAK BOOKLET:
+          - Kertas: A4, Orientasi: Lanskap (Landscape).
+          - Cetak Dua Sisi (Duplex): pilih "Flip on Short Edge".
+          ==============================================================
+          "@
+          Set-Content -Path "$stageDir\README-PORTABEL.txt" -Value $readme -Encoding UTF8
+
+          $zipPath = "$outDir\BukuCepat-$tag-windows-x64-portable.zip"
+          $standaloneExe = "$outDir\BukuCepat-$tag-windows-x64.exe"
+
+          Compress-Archive -Path "$stageDir\*" -DestinationPath $zipPath -Force
+          Copy-Item $exeSource $standaloneExe -Force
+
+          $hashes = @()
+          foreach ($file in @($zipPath, $standaloneExe)) {
+            $hash = (Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower()
+            $name = Split-Path -Path $file -Leaf
+            $hashes += "$hash  $name"
+          }
+          Set-Content -Path "$outDir\SHA256SUMS.txt" -Value ($hashes -join "`n") -Encoding ASCII
+
+      - name: Ekstrak catatan rilis dari CHANGELOG.md
+        shell: pwsh
+        run: node scripts/release.mjs extract "${{ steps.version.outputs.version }}" --output release-notes.md
+
+      - name: Unggah artefak build Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: BukuCepat-${{ steps.version.outputs.tag }}-windows-x64-portable
+          path: |
+            release-assets/*
+            release-notes.md
+          retention-days: 30
+
+      - name: Publikasikan GitHub Release
+        if: github.ref_type == 'tag' || inputs.publish_release == true
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: BukuCepat ${{ steps.version.outputs.tag }} (Windows Portabel)
+          body_path: release-notes.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+          files: |
+            release-assets/BukuCepat-${{ steps.version.outputs.tag }}-windows-x64-portable.zip
+            release-assets/BukuCepat-${{ steps.version.outputs.tag }}-windows-x64.exe
+            release-assets/SHA256SUMS.txt

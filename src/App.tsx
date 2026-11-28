@@ -23,6 +23,7 @@ import {
   loadPdfFromArrayBuffer,
   clearThumbnailCache,
 } from './utils/pdfRenderer';
+import { saveBinaryFile } from './utils/fileSave';
 import { createSampleA5Pdf } from './utils/samplePdf';
 import { exportBatchAsZip, ZipExportProgress } from './utils/zipExport';
 import { generateBookletPdf } from './utils/pdfGenerator';
@@ -268,25 +269,24 @@ export default function App() {
         }
       );
 
-      const blob = new Blob([generatedBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
       const cleanBaseName = item.filename.replace(/\.pdf$/i, '');
       const downloadName = `Booklet_${cleanBaseName}_A4-Lanskap.pdf`;
 
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = downloadName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const { saved } = await saveBinaryFile({
+        data: generatedBytes,
+        defaultFilename: downloadName,
+        mimeType: 'application/pdf',
+        filterName: 'Dokumen PDF',
+        filterExtensions: ['pdf'],
+      });
 
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-      }, 5000);
+      if (!saved) {
+        return;
+      }
 
       showSuccess(
         'Booklet Siap Dicetak!',
-        `Berkas "${downloadName}" berhasil dibuat dan mulai diunduh.`
+        `Berkas "${downloadName}" berhasil dibuat dan disimpan ke perangkat Anda.`
       );
     } catch (err) {
       console.error('Error downloading item:', err);
@@ -315,14 +315,16 @@ export default function App() {
         percentage: 0,
       });
 
-      await exportBatchAsZip(readyItems, (progress) => {
+      const saved = await exportBatchAsZip(readyItems, (progress) => {
         setZipProgress(progress);
       });
 
-      showSuccess(
-        'Arsip ZIP Berhasil Dibuat!',
-        `Semua ${readyItems.length} berkas booklet dan panduan cetak telah dikompresi ke dalam ZIP.`
-      );
+      if (saved) {
+        showSuccess(
+          'Arsip ZIP Berhasil Dibuat!',
+          `Semua ${readyItems.length} berkas booklet dan panduan cetak telah dikompresi ke dalam ZIP.`
+        );
+      }
     } catch (err) {
       console.error('Error exporting ZIP:', err);
       showError(

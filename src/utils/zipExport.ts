@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 import { BatchItem } from '../types/booklet';
 import { generateBookletPdf } from './pdfGenerator';
+import { saveBinaryFile } from './fileSave';
 
 export interface ZipExportProgress {
   currentFile: string;
@@ -10,12 +11,12 @@ export interface ZipExportProgress {
 }
 
 /**
- * Compiles all batch items into a single ZIP archive for one-click download.
+ * Compiles all batch items into a single ZIP archive for one-click download or native desktop save.
  */
 export async function exportBatchAsZip(
   items: BatchItem[],
   onProgress?: (progress: ZipExportProgress) => void
-): Promise<void> {
+): Promise<boolean> {
   const zip = new JSZip();
 
   // Create a folder inside zip
@@ -108,16 +109,14 @@ LANGKAH PENJILIDAN (FINISHING):
     compressionOptions: { level: 6 },
   });
 
-  // Trigger download
-  const url = URL.createObjectURL(zipBlob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `Batch_Booklet_A4_${new Date().toISOString().slice(0, 10)}.zip`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const { saved } = await saveBinaryFile({
+    data: zipBlob,
+    defaultFilename: `Batch_Booklet_A4_${new Date().toISOString().slice(0, 10)}.zip`,
+    mimeType: 'application/zip',
+    filterName: 'Arsip ZIP',
+    filterExtensions: ['zip'],
+    revokeDelayMs: 10000,
+  });
 
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 10000);
+  return saved;
 }

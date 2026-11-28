@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Download, Printer, Check, ChevronDown } from 'lucide-react';
 import { ImpositionResult } from '../types/booklet';
 import { generateBookletPdf } from '../utils/pdfGenerator';
+import { saveBinaryFile } from '../utils/fileSave';
 import { useToast } from '../context/ToastContext';
 import { parsePdfError } from '../utils/errorParser';
 
@@ -50,10 +51,6 @@ export const DownloadPanel: React.FC<DownloadPanelProps> = ({
 
       setProgressPercent(100);
 
-      // Create download blob
-      const blob = new Blob([generatedBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-
       let suffix = '';
       if (mode === 'odd-only') suffix = '_Sisi-Depan-Ganjil';
       if (mode === 'even-only') suffix = '_Sisi-Belakang-Genap';
@@ -61,21 +58,22 @@ export const DownloadPanel: React.FC<DownloadPanelProps> = ({
       const baseName = imposition.metadata.filename.replace(/\.pdf$/i, '');
       const downloadName = `Booklet_${baseName}_A4-Lanskap${suffix}.pdf`;
 
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = downloadName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const { saved } = await saveBinaryFile({
+        data: generatedBytes,
+        defaultFilename: downloadName,
+        mimeType: 'application/pdf',
+        filterName: 'Dokumen PDF',
+        filterExtensions: ['pdf'],
+      });
 
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-      }, 5000);
+      if (!saved) {
+        return;
+      }
 
       setDownloadSuccess(true);
       showSuccess(
         'Booklet Siap Dicetak!',
-        `Berkas "${downloadName}" berhasil dibuat dan diunduh ke perangkat Anda.`
+        `Berkas "${downloadName}" berhasil dibuat dan disimpan ke perangkat Anda.`
       );
 
       setTimeout(() => {

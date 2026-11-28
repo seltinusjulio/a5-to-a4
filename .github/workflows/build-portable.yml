@@ -1,0 +1,109 @@
+name: Build Portabel Windows (Artifact)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-portable:
+    name: Build Produksi Portabel Windows (x64)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repositori
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo & Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Instal dependensi frontend
+        shell: pwsh
+        run: |
+          if (Test-Path package-lock.json) {
+            npm ci
+          } else {
+            npm install --no-audit --no-fund
+          }
+
+      - name: Jalankan lint & typecheck
+        run: npm run lint
+
+      - name: Jalankan pengujian otomatis
+        run: npm test
+
+      - name: Build produksi portabel Windows (tanpa installer)
+        shell: pwsh
+        env:
+          VITE_BASE_PATH: /
+        run: npx tauri build --no-bundle
+
+      - name: Siapkan folder portabel siap unduh
+        shell: pwsh
+        run: |
+          $exeSource = "src-tauri\target\release\bukucepat.exe"
+          if (-not (Test-Path $exeSource)) {
+            throw "Biner portabel tidak ditemukan di $exeSource"
+          }
+
+          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+          $version = $pkg.version
+          $shortSha = "${{ github.sha }}".Substring(0, 7)
+
+          $outDir = "portable-dist"
+          if (Test-Path $outDir) {
+            Remove-Item -Recurse -Force $outDir
+          }
+          New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+
+          Copy-Item $exeSource "$outDir\BukuCepat.exe" -Force
+          if (Test-Path "CHANGELOG.md") {
+            Copy-Item "CHANGELOG.md" "$outDir\CHANGELOG.md" -Force
+          }
+
+          $readme = @"
+          ==============================================================
+          BUKUCEPAT v$version ($shortSha) — PORTABEL WINDOWS (OFFLINE)
+          ==============================================================
+
+          Aplikasi portabel tanpa installer. Cukup ekstrak arsip ZIP ini
+          ke folder mana saja (atau flashdisk) lalu klik ganda:
+
+            BukuCepat.exe
+
+          Catatan:
+          - Jika muncul peringatan Windows SmartScreen saat pertama kali
+            dibuka, pilih "More info" lalu "Run anyway".
+          - Berjalan 100% offline di Windows 10 (terbaru) & Windows 11.
+          ==============================================================
+          "@
+          Set-Content -Path "$outDir\README-PORTABEL.txt" -Value $readme -Encoding UTF8
+
+          $hash = (Get-FileHash -Path "$outDir\BukuCepat.exe" -Algorithm SHA256).Hash.ToLower()
+          Set-Content -Path "$outDir\SHA256SUMS.txt" -Value "$hash  BukuCepat.exe" -Encoding ASCII
+
+      - name: Unggah folder ZIP portabel sebagai Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BukuCepat-Windows-Portable
+          path: portable-dist/
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 30
