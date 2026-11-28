@@ -32,13 +32,15 @@ jobs:
       - name: Konfigurasi GitHub Pages
         id: pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Instal dependensi
         run: |
           if [ -f package-lock.json ]; then
             npm ci
           else
-            npm install
+            npm install --no-audit --no-fund
           fi
 
       - name: Jalankan lint & typecheck
@@ -49,7 +51,7 @@ jobs:
 
       - name: Build produksi untuk GitHub Pages
         env:
-          VITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          VITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
         run: npm run build
 
       - name: Siapkan berkas .nojekyll & fallback 404 SPA
