@@ -1,6 +1,6 @@
 [package]
 name = "katern"
-version = "1.0.0"
+version = "1.1.0"
 description = "Katern - Konverter Booklet PDF A5 ke A4 offline portabel untuk Windows"
 authors = ["Katern"]
 edition = "2021"
