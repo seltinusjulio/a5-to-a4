@@ -38,6 +38,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Perbarui CHANGELOG.md otomatis dari riwayat commit
+        run: node scripts/generate-changelog.js
+
       - name: Setup Rust stable
         uses: dtolnay/rust-toolchain@stable
 
