@@ -1,4 +1,4 @@
-name: Build Portabel Windows — Katern (Artifact)
+name: Auto-Release Portabel Windows — Katern
 
 on:
   push:
@@ -6,40 +6,51 @@ on:
       - main
     paths-ignore:
       - 'CHANGELOG.md'
+      - '**/*.md'
+      - '.gitignore'
+      - 'LICENSE'
+      - 'docs/**'
+      - 'metadata.json'
   workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Kenaikan versi (auto = deteksi dari commit, atau pilih manual)'
+        required: false
+        type: choice
+        default: 'auto'
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+      publish_release:
+        description: 'Buat tag & publikasikan GitHub Release otomatis'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
 
 concurrency:
-  group: build-portable-${{ github.ref }}
-  cancel-in-progress: true
+  group: katern-auto-release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build-portable:
-    name: Build Produksi Portabel Windows (x64)
+  build-and-release:
+    name: Verifikasi, Auto-Version & Rilis Portabel Windows (x64)
     runs-on: windows-latest
     steps:
-      - name: Checkout repositori
+      - name: Checkout repositori (riwayat penuh & tag)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Perbarui CHANGELOG.md otomatis dari riwayat commit
-        run: node scripts/generate-changelog.js
-
-      - name: Setup Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Cargo & Rust
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri
 
       - name: Instal dependensi frontend
         shell: pwsh
@@ -56,13 +67,35 @@ jobs:
       - name: Jalankan pengujian otomatis
         run: npm test
 
+      - name: Hitung versi baru & perbarui CHANGELOG.md otomatis
+        id: release
+        shell: pwsh
+        run: |
+          $argsList = @("scripts/release.mjs", "auto", "--notes-output", "release-notes.md")
+          if ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ inputs.bump }}" -ne "auto" -and "${{ inputs.bump }}" -ne "") {
+            $argsList += @("--force-bump", "${{ inputs.bump }}")
+          }
+          node @argsList
+
+      - name: Setup Rust stable
+        if: steps.release.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo & Rust
+        if: steps.release.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
       - name: Build produksi portabel Windows (tanpa installer)
+        if: steps.release.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
         shell: pwsh
         env:
           VITE_BASE_PATH: /
         run: npx tauri build --no-bundle
 
-      - name: Siapkan folder portabel siap unduh
+      - name: Siapkan paket portabel (.zip, .exe, & SHA256SUMS)
+        if: steps.release.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
         shell: pwsh
         run: |
           $exeSource = "src-tauri\target\release\katern.exe"
@@ -70,15 +103,14 @@ jobs:
             throw "Biner portabel tidak ditemukan di $exeSource"
           }
 
-          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
-          $version = $pkg.version
-          $shortSha = "${{ github.sha }}".Substring(0, 7)
+          $version = "${{ steps.release.outputs.version }}"
+          $tag = "${{ steps.release.outputs.tag }}"
 
           $outDir = "portable-dist"
-          if (Test-Path $outDir) {
-            Remove-Item -Recurse -Force $outDir
-          }
-          New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+          $releaseDir = "release-assets"
+          if (Test-Path $outDir) { Remove-Item -Recurse -Force $outDir }
+          if (Test-Path $releaseDir) { Remove-Item -Recurse -Force $releaseDir }
+          New-Item -ItemType Directory -Force -Path $outDir, $releaseDir | Out-Null
 
           Copy-Item $exeSource "$outDir\Katern.exe" -Force
           if (Test-Path "CHANGELOG.md") {
@@ -87,46 +119,92 @@ jobs:
 
           $readme = @"
           ==============================================================
-          KATERN v$version ($shortSha) — PORTABEL WINDOWS (OFFLINE)
+          KATERN $tag — APLIKASI PORTABEL WINDOWS (100% OFFLINE)
           ==============================================================
 
-          Aplikasi portabel tanpa installer. Cukup ekstrak arsip ZIP ini
-          ke folder mana saja (atau flashdisk) lalu klik ganda:
+          Katern adalah konverter PDF A5 Potret ke Booklet A4 Lanskap
+          (2-Up saddle-stitch) yang berjalan 100% lokal tanpa internet
+          dan tanpa instalasi.
 
-            Katern.exe
+          CARA MENJALANKAN:
+          1. Ekstrak arsip ZIP ke folder mana saja (atau flashdisk).
+          2. Klik ganda "Katern.exe".
+          3. Jika muncul peringatan Windows SmartScreen pada pemakaian
+             pertama, klik "More info" lalu "Run anyway".
 
-          Catatan:
-          - Jika muncul peringatan Windows SmartScreen saat pertama kali
-            dibuka, pilih "More info" lalu "Run anyway".
-          - Berjalan 100% offline di Windows 10 (terbaru) & Windows 11.
+          TIPS CETAK BOOKLET:
+          - Kertas: A4, Orientasi: Lanskap (Landscape).
+          - Cetak Dua Sisi (Duplex): pilih "Flip on Short Edge".
           ==============================================================
           "@
           Set-Content -Path "$outDir\README-PORTABEL.txt" -Value $readme -Encoding UTF8
 
-          $hash = (Get-FileHash -Path "$outDir\Katern.exe" -Algorithm SHA256).Hash.ToLower()
-          Set-Content -Path "$outDir\SHA256SUMS.txt" -Value "$hash  Katern.exe" -Encoding ASCII
+          $exeHash = (Get-FileHash -Path "$outDir\Katern.exe" -Algorithm SHA256).Hash.ToLower()
+          Set-Content -Path "$outDir\SHA256SUMS.txt" -Value "$exeHash  Katern.exe" -Encoding ASCII
+
+          $zipPath = "$releaseDir\Katern-$tag-windows-x64-portable.zip"
+          $standaloneExe = "$releaseDir\Katern-$tag-windows-x64.exe"
+          Compress-Archive -Path "$outDir\*" -DestinationPath $zipPath -Force
+          Copy-Item $exeSource $standaloneExe -Force
+
+          $releaseHashes = @()
+          foreach ($file in @($zipPath, $standaloneExe)) {
+            $h = (Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower()
+            $name = Split-Path -Path $file -Leaf
+            $releaseHashes += "$h  $name"
+          }
+          Set-Content -Path "$releaseDir\SHA256SUMS.txt" -Value ($releaseHashes -join "`n") -Encoding ASCII
 
       - name: Unggah folder ZIP portabel sebagai Artifact
+        if: steps.release.outputs.should_release == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
-          name: Katern-Windows-Portable
+          name: Katern-${{ steps.release.outputs.tag }}-Windows-Portable
           path: portable-dist/
           if-no-files-found: error
           compression-level: 9
           retention-days: 30
 
-      - name: Simpan pembaruan CHANGELOG.md ke repositori
-        if: github.ref == 'refs/heads/main'
+      - name: Commit versi & CHANGELOG.md lalu buat tag Git
+        if: >-
+          steps.release.outputs.should_release == 'true' &&
+          github.ref == 'refs/heads/main' &&
+          (github.event_name == 'push' || inputs.publish_release == true)
         shell: pwsh
         run: |
+          $tag = "${{ steps.release.outputs.tag }}"
+          $version = "${{ steps.release.outputs.version }}"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git diff --quiet CHANGELOG.md
+
+          git add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml CHANGELOG.md
+          git diff --cached --quiet
           if ($LASTEXITCODE -ne 0) {
-            git add CHANGELOG.md
-            git commit -m "chore(changelog): perbarui CHANGELOG.md otomatis [skip ci]"
+            git commit -m "chore(release): $tag [skip ci]"
             git pull --rebase origin main
             git push origin HEAD:main
-          } else {
-            Write-Host "Tidak ada perubahan baru pada CHANGELOG.md."
           }
+
+          $existingTag = git tag --list $tag
+          if (-not $existingTag) {
+            git tag -a $tag -m "Katern $tag"
+            git push origin $tag
+          }
+
+      - name: Publikasikan GitHub Release otomatis
+        if: >-
+          steps.release.outputs.should_release == 'true' &&
+          github.ref == 'refs/heads/main' &&
+          (github.event_name == 'push' || inputs.publish_release == true)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.tag }}
+          name: Katern ${{ steps.release.outputs.tag }} (Windows Portabel)
+          body_path: release-notes.md
+          draft: false
+          prerelease: ${{ contains(steps.release.outputs.version, '-') }}
+          files: |
+            release-assets/Katern-${{ steps.release.outputs.tag }}-windows-x64-portable.zip
+            release-assets/Katern-${{ steps.release.outputs.tag }}-windows-x64.exe
+            release-assets/SHA256SUMS.txt

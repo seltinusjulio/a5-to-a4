@@ -13,10 +13,9 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan pe
 - Rilis portabel Windows (`.exe` & `.zip` tanpa installer) berbasis Tauri v2 yang dibangun otomatis lewat GitHub Actions.
 - Mode offline murni: font UI (*Archivo*, *Plus Jakarta Sans*, *JetBrains Mono*) serta CMap & standard fonts PDF.js kini dibundel langsung di dalam aplikasi tanpa panggilan CDN eksternal.
 - Dialog simpan berkas bawaan Windows (*Save As*) otomatis saat mengekspor PDF atau arsip ZIP pada aplikasi desktop portabel.
-- Skrip rilis dan ekstraksi catatan rilis otomatis (`npm run release -- <versi>`).
+- Otomatisasi *auto-version*, *auto-tag*, pembaruan `CHANGELOG.md`, dan publikasi **GitHub Releases** pada setiap pembaruan kode di branch `main`.
 
 ### Diubah
-- Rename application from BukuCepat to Katern (`dbb016e` — 2026-11-28)
 - Perubahan nama aplikasi dari *BukuCepat* menjadi **Katern**.
 - Initial commit (`1f508a6` — 2026-11-27)
 
